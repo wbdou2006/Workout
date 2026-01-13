@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Workout Tracker</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { 
+            height: 100%; 
+            width: 100%;
+            overflow: hidden;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(to right, #24243e, #302b63, #0f0c29);
+            color: white;
+            overflow-x: hidden;
+            overflow-y: auto;
+            height: 100%;
+            width: 100%;
+            position: fixed;
+            -webkit-overflow-scrolling: touch;
+        }
+        #root { 
+            height: 100%; 
+            width: 100%;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+        .app { 
+            min-height: 100vh; 
+            padding-bottom: 20px; 
+            max-width: 100%;
+        }
+        .header { padding: 25px 20px; }
+        .header h1 { font-size: 28px; font-weight: 700; margin-bottom: 15px; }
+        .stats { display: flex; gap: 15px; }
+        .stat-box { flex: 1; background: rgba(255,255,255,0.1); border-radius: 12px; padding: 12px; text-align: center; }
+        .stat-number { color: #4ade80; font-size: 20px; font-weight: 700; }
+        .stat-label { color: rgba(255,255,255,0.6); font-size: 12px; }
+        .stats-button { background: linear-gradient(135deg, #8b5cf6, #6366f1); border: none; color: white; border-radius: 10px; padding: 10px 16px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; margin: 15px 20px 0; }
+        .stats-button svg { width: 16px; height: 16px; }
+        .reset-button { background: rgba(249,115,22,0.15); border: 1px solid rgba(249,115,22,0.3); color: #f97316; border-radius: 10px; padding: 10px 16px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; margin: 0 20px 30px; }
+        .reset-button svg { width: 16px; height: 16px; }
+        .category-list { padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+        .category-item { background: rgba(255,255,255,0.08); border-radius: 12px; display: flex; cursor: pointer; position: relative; }
+        .category-border { width: 4px; height: 100%; }
+        .category-content { display: flex; align-items: center; gap: 12px; padding: 18px 15px; flex: 1; }
+        .category-icon { width: 32px; height: 32px; }
+        .category-icon svg { width: 100%; height: 100%; stroke: white; fill: none; stroke-width: 2; }
+        .category-info { flex: 1; }
+        .category-name { font-size: 16px; font-weight: 600; margin-bottom: 5px; }
+        .progress-container { display: flex; align-items: center; gap: 8px; }
+        .progress-bar { width: 100px; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; }
+        .progress-fill { height: 100%; background: #4ade80; border-radius: 3px; transition: width 0.3s; }
+        .progress-text { font-size: 12px; color: rgba(255,255,255,0.6); white-space: nowrap; }
+        .in-progress-badge { position: absolute; top: 8px; right: 15px; background: #f59e0b; color: white; font-size: 9px; font-weight: 700; padding: 3px 8px; border-radius: 4px; }
+        .exercise-view { min-height: 100vh; padding-bottom: 100px; }
+        .category-header { background: rgba(255,255,255,0.08); border-radius: 16px; padding: 20px; margin: 25px 20px 20px; border-left: 4px solid; }
+        .category-title { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+        .category-title svg { width: 32px; height: 32px; stroke-width: 2; fill: none; }
+        .category-title h2 { font-size: 22px; font-weight: 700; }
+        .category-stats { display: flex; gap: 20px; font-size: 13px; color: rgba(255,255,255,0.7); }
+        .category-stats span { color: #4ade80; font-weight: 600; }
+        .exercise-list { padding: 0 20px 20px; display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px; }
+        .exercise-item { background: rgba(255,255,255,0.06); border-radius: 12px; padding: 16px; display: flex; align-items: center; gap: 15px; cursor: pointer; }
+        .exercise-item.completed { background: rgba(74,222,128,0.1); border: 1px solid rgba(74,222,128,0.3); }
+        .checkbox { width: 24px; height: 24px; border: 2px solid rgba(255,255,255,0.3); border-radius: 6px; display: flex; align-items: center; justify-content: center; }
+        .exercise-item.completed .checkbox { background: #4ade80; border-color: #4ade80; }
+        .checkbox svg { width: 16px; height: 16px; stroke: white; stroke-width: 3; opacity: 0; transition: opacity 0.3s; }
+        .exercise-item.completed .checkbox svg { opacity: 1; }
+        .exercise-details { flex: 1; }
+        .exercise-name { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+        .exercise-item.completed .exercise-name { color: rgba(255,255,255,0.7); text-decoration: line-through; }
+        .exercise-meta { font-size: 13px; color: rgba(255,255,255,0.5); }
+        .exercise-sets { font-size: 13px; color: #4ade80; font-weight: 600; }
+        .action-bar { position: fixed; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, #0f0c29 80%, transparent); padding: 20px; z-index: 100; }
+        .action-button { border: none; border-radius: 12px; padding: 16px; font-size: 15px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .action-button svg { width: 18px; height: 18px; }
+        .save-button { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; }
+        .complete-button { background: linear-gradient(135deg, #4ade80, #10b981); color: white; }
+        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(74,222,128,0.95); color: white; padding: 15px 25px; border-radius: 12px; font-size: 14px; font-weight: 600; z-index: 1000; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+        .toast.show { opacity: 1; }
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+        .modal { background: #1f1f3a; border-radius: 16px; padding: 25px; max-width: 400px; width: 100%; }
+        .modal h3 { font-size: 20px; margin-bottom: 10px; }
+        .modal p { color: rgba(255,255,255,0.7); font-size: 14px; margin-bottom: 20px; line-height: 1.5; }
+        .modal-buttons { display: flex; gap: 10px; }
+        .modal-button { flex: 1; padding: 12px; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; border: none; }
+        .modal-button.cancel { background: rgba(255,255,255,0.1); color: white; }
+        .modal-button.danger { background: #f97316; color: white; }
+        
+        /* Stats View */
+        .stats-view { min-height: 100vh; padding: 25px 20px 100px; }
+        .stats-header { display: flex; align-items: center; gap: 12px; margin-bottom: 25px; }
+        .back-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 8px; padding: 8px 12px; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 6px; border: none; }
+        .stats-header h2 { font-size: 24px; font-weight: 700; flex: 1; }
+        
+        /* Donut Chart */
+        .donut-container { background: rgba(255,255,255,0.08); border-radius: 16px; padding: 20px; margin-bottom: 20px; text-align: center; }
+        .donut-chart { width: 200px; height: 200px; margin: 20px auto; }
+        .legend { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 20px; }
+        .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; }
+        .legend-color { width: 12px; height: 12px; border-radius: 3px; }
+        
+        /* Weekly Calendar */
+        .weekly-calendar { margin-bottom: 20px; }
+        .calendar-title { font-size: 16px; font-weight: 600; margin-bottom: 15px; padding: 0 5px; }
+        .day-card { background: rgba(255,255,255,0.06); border-radius: 12px; padding: 15px; margin-bottom: 10px; cursor: pointer; transition: all 0.3s; }
+        .day-card:active { transform: scale(0.98); }
+        .day-header { display: flex; align-items: center; justify-content: space-between; }
+        .day-info { flex: 1; }
+        .day-name { font-size: 15px; font-weight: 600; }
+        .day-date { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+        .day-summary { display: flex; align-items: center; gap: 8px; }
+        .workout-count { color: #4ade80; font-weight: 600; font-size: 14px; }
+        .chevron { width: 16px; height: 16px; stroke: rgba(255,255,255,0.5); transition: transform 0.3s; }
+        .chevron.open { transform: rotate(90deg); }
+        .day-details { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
+        .day-details.open { max-height: 600px; }
+        .day-workouts { padding-top: 15px; }
+        .day-workout-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .day-workout-item:last-child { border-bottom: none; }
+        .workout-color { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+        .workout-name { flex: 1; font-size: 13px; }
+        .workout-status { font-size: 12px; padding: 2px 8px; border-radius: 4px; }
+        .workout-status.completed { background: rgba(74,222,128,0.2); color: #4ade80; }
+        .workout-status.in-progress { background: rgba(245,158,11,0.2); color: #f59e0b; }
+        .workout-status.not-started { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.5); }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        const CheckIcon = () => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12" strokeLinecap="round" strokeLinejoin="round"/></svg>);
+        const SaveIcon = () => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>);
+        const RefreshIcon = () => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2" strokeLinecap="round" strokeLinejoin="round"/></svg>);
+        const ChartIcon = () => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>);
+        const ChevronLeftIcon = () => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 18l-6-6 6-6"/></svg>);
+        const ChevronRightIcon = () => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 18l6-6-6-6"/></svg>);
+
+        const DonutChart = ({ weeklyData, categories }) => {
+            // Calculate weekly totals
+            let weeklyCompleted = 0;
+            let weeklyTotal = 0;
+            
+            Object.values(weeklyData).forEach(dayData => {
+                if (dayData) {
+                    dayData.forEach(cat => {
+                        weeklyCompleted += cat.exercises.filter(e => e.isCompleted).length;
+                        weeklyTotal += cat.exercises.length;
+                    });
+                }
+            });
+            
+            const percent = weeklyTotal > 0 ? Math.round((weeklyCompleted / weeklyTotal) * 100) : 0;
+
+            // Create donut segments
+            let currentAngle = -90;
+            const segments = categories.map(cat => {
+                const catTotal = cat.exercises.length;
+                const angle = (catTotal / (categories.reduce((sum, c) => sum + c.exercises.length, 0))) * 360;
+                const segment = {
+                    color: cat.color,
+                    startAngle: currentAngle,
+                    endAngle: currentAngle + angle
+                };
+                currentAngle += angle;
+                return segment;
+            });
+
+            const polarToCartesian = (centerX, centerY, radius, angleInDegrees) => {
+                const angleInRadians = (angleInDegrees * Math.PI) / 180.0;
+                return {
+                    x: centerX + (radius * Math.cos(angleInRadians)),
+                    y: centerY + (radius * Math.sin(angleInRadians))
+                };
+            };
+
+            const createArc = (startAngle, endAngle) => {
+                const start = polarToCartesian(100, 100, 80, endAngle);
+                const end = polarToCartesian(100, 100, 80, startAngle);
+                const largeArc = endAngle - startAngle <= 180 ? '0' : '1';
+                return `M ${start.x} ${start.y} A 80 80 0 ${largeArc} 0 ${end.x} ${end.y} L 100 100 Z`;
+            };
+
+            return (
+                <svg className="donut-chart" viewBox="0 0 200 200">
+                    <circle cx="100" cy="100" r="90" fill="rgba(255,255,255,0.05)" />
+                    {segments.map((seg, i) => (
+                        <path key={i} d={createArc(seg.startAngle, seg.endAngle)} fill={seg.color} opacity="0.8" />
+                    ))}
+                    <circle cx="100" cy="100" r="60" fill="#1f1f3a" />
+                    <text x="100" y="95" textAnchor="middle" fill="white" fontSize="32" fontWeight="700">{percent}%</text>
+                    <text x="100" y="115" textAnchor="middle" fill="rgba(255,255,255,0.6)" fontSize="12">This Week</text>
+                </svg>
+            );
+        };
+
+        const CategoryIcon = ({ categoryName, color }) => {
+            const icons = {
+                'Legs': <svg viewBox="0 0 24 24"><path d="M12 2L4 7v10l8 5 8-5V7z"/><path d="M12 22V12"/><path d="M4 7l8 5 8-5"/></svg>,
+                'Back': <svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>,
+                'Chest': <svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>,
+                'Core': <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>,
+                'Shoulders': <svg viewBox="0 0 24 24"><path d="M6.5 6.5l11 11"/><path d="M17.5 6.5l-11 11"/><circle cx="12" cy="12" r="9"/></svg>,
+                'Arms': <svg viewBox="0 0 24 24"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>
+            };
+            return <div className="category-icon" style={{stroke: color}}>{icons[categoryName] || icons['Legs']}</div>;
+        };
+
+        // Get today's date as YYYY-MM-DD
+        const getTodayDate = () => new Date().toISOString().split('T')[0];
+
+        // Get all dates for current week (Sun-Sat)
+        const getWeekDates = () => {
+            const today = new Date();
+            const currentDay = today.getDay();
+            const dates = [];
+            
+            for (let i = 0; i < 7; i++) {
+                const date = new Date(today);
+                date.setDate(today.getDate() - (currentDay - i));
+                dates.push(date.toISOString().split('T')[0]);
+            }
+            return dates;
+        };
+
+        // Template for fresh categories
+        const getDefaultCategories = () => [
+            { id: 'legs', name: 'Legs', color: '#f59e0b', exercises: [
+                { id: 'l1', name: 'Barbell Squats', type: 'Compound', targetMuscles: 'Quads, Glutes', sets: 4, reps: 8, isCompleted: false },
+                { id: 'l2', name: 'Romanian Deadlifts', type: 'Compound', targetMuscles: 'Hamstrings', sets: 3, reps: 10, isCompleted: false },
+                { id: 'l3', name: 'Walking Lunges', type: 'Unilateral', targetMuscles: 'Quads, Balance', sets: 3, reps: 12, isCompleted: false },
+                { id: 'l4', name: 'Leg Press', type: 'Machine', targetMuscles: 'Overall Legs', sets: 3, reps: 15, isCompleted: false },
+                { id: 'l5', name: 'Leg Curls', type: 'Isolation', targetMuscles: 'Hamstrings', sets: 3, reps: 12, isCompleted: false },
+                { id: 'l6', name: 'Leg Extensions', type: 'Isolation', targetMuscles: 'Quads', sets: 3, reps: 15, isCompleted: false },
+                { id: 'l7', name: 'Calf Raises', type: 'Isolation', targetMuscles: 'Calves', sets: 4, reps: 20, isCompleted: false },
+                { id: 'l8', name: 'Bulgarian Split Squats', type: 'Unilateral', targetMuscles: 'Quads, Glutes', sets: 3, reps: 10, isCompleted: false }
+            ]},
+            { id: 'back', name: 'Back', color: '#3b82f6', exercises: [
+                { id: 'b1', name: 'Pull-ups', type: 'Compound', targetMuscles: 'Lats, Biceps', sets: 4, reps: 8, isCompleted: false },
+                { id: 'b2', name: 'Barbell Rows', type: 'Compound', targetMuscles: 'Mid Back', sets: 4, reps: 10, isCompleted: false },
+                { id: 'b3', name: 'Lat Pulldowns', type: 'Machine', targetMuscles: 'Lats', sets: 3, reps: 12, isCompleted: false },
+                { id: 'b4', name: 'Seated Cable Rows', type: 'Cable', targetMuscles: 'Mid Back', sets: 3, reps: 12, isCompleted: false },
+                { id: 'b5', name: 'Face Pulls', type: 'Cable', targetMuscles: 'Rear Delts', sets: 3, reps: 15, isCompleted: false },
+                { id: 'b6', name: 'Deadlifts', type: 'Compound', targetMuscles: 'Full Back', sets: 3, reps: 6, isCompleted: false }
+            ]},
+            { id: 'chest', name: 'Chest', color: '#ec4899', exercises: [
+                { id: 'c1', name: 'Bench Press', type: 'Compound', targetMuscles: 'Chest, Triceps', sets: 4, reps: 8, isCompleted: false },
+                { id: 'c2', name: 'Incline Dumbbell Press', type: 'Compound', targetMuscles: 'Upper Chest', sets: 3, reps: 10, isCompleted: false },
+                { id: 'c3', name: 'Push-ups', type: 'Bodyweight', targetMuscles: 'Chest, Core', sets: 3, reps: 15, isCompleted: false },
+                { id: 'c4', name: 'Cable Flyes', type: 'Isolation', targetMuscles: 'Chest', sets: 3, reps: 12, isCompleted: false },
+                { id: 'c5', name: 'Dips', type: 'Compound', targetMuscles: 'Lower Chest', sets: 3, reps: 10, isCompleted: false },
+                { id: 'c6', name: 'Pec Deck', type: 'Machine', targetMuscles: 'Chest', sets: 3, reps: 15, isCompleted: false },
+                { id: 'c7', name: 'Decline Press', type: 'Compound', targetMuscles: 'Lower Chest', sets: 3, reps: 10, isCompleted: false }
+            ]},
+            { id: 'core', name: 'Core', color: '#8b5cf6', exercises: [
+                { id: 'co1', name: 'Planks', type: 'Isometric', targetMuscles: 'Abs, Core', sets: 3, reps: 60, isCompleted: false },
+                { id: 'co2', name: 'Crunches', type: 'Isolation', targetMuscles: 'Abs', sets: 3, reps: 20, isCompleted: false },
+                { id: 'co3', name: 'Leg Raises', type: 'Isolation', targetMuscles: 'Lower Abs', sets: 3, reps: 15, isCompleted: false },
+                { id: 'co4', name: 'Russian Twists', type: 'Rotation', targetMuscles: 'Obliques', sets: 3, reps: 20, isCompleted: false },
+                { id: 'co5', name: 'Mountain Climbers', type: 'Dynamic', targetMuscles: 'Full Core', sets: 3, reps: 20, isCompleted: false },
+                { id: 'co6', name: 'Bicycle Crunches', type: 'Dynamic', targetMuscles: 'Abs, Obliques', sets: 3, reps: 20, isCompleted: false },
+                { id: 'co7', name: 'Dead Bug', type: 'Stability', targetMuscles: 'Core', sets: 3, reps: 12, isCompleted: false },
+                { id: 'co8', name: 'Hanging Knee Raises', type: 'Advanced', targetMuscles: 'Lower Abs', sets: 3, reps: 10, isCompleted: false },
+                { id: 'co9', name: 'Ab Wheel Rollouts', type: 'Advanced', targetMuscles: 'Full Core', sets: 3, reps: 10, isCompleted: false }
+            ]},
+            { id: 'shoulders', name: 'Shoulders', color: '#10b981', exercises: [
+                { id: 's1', name: 'Overhead Press', type: 'Compound', targetMuscles: 'Shoulders, Triceps', sets: 4, reps: 8, isCompleted: false },
+                { id: 's2', name: 'Lateral Raises', type: 'Isolation', targetMuscles: 'Side Delts', sets: 3, reps: 12, isCompleted: false },
+                { id: 's3', name: 'Front Raises', type: 'Isolation', targetMuscles: 'Front Delts', sets: 3, reps: 12, isCompleted: false },
+                { id: 's4', name: 'Arnold Press', type: 'Compound', targetMuscles: 'All Delts', sets: 3, reps: 10, isCompleted: false },
+                { id: 's5', name: 'Shrugs', type: 'Isolation', targetMuscles: 'Traps', sets: 3, reps: 15, isCompleted: false }
+            ]},
+            { id: 'arms', name: 'Arms', color: '#ef4444', exercises: [
+                { id: 'a1', name: 'Barbell Curls', type: 'Isolation', targetMuscles: 'Biceps', sets: 4, reps: 10, isCompleted: false },
+                { id: 'a2', name: 'Tricep Dips', type: 'Compound', targetMuscles: 'Triceps', sets: 4, reps: 12, isCompleted: false },
+                { id: 'a3', name: 'Hammer Curls', type: 'Isolation', targetMuscles: 'Biceps, Forearms', sets: 3, reps: 12, isCompleted: false },
+                { id: 'a4', name: 'Tricep Pushdowns', type: 'Isolation', targetMuscles: 'Triceps', sets: 3, reps: 15, isCompleted: false },
+                { id: 'a5', name: 'Preacher Curls', type: 'Isolation', targetMuscles: 'Biceps', sets: 3, reps: 12, isCompleted: false },
+                { id: 'a6', name: 'Skull Crushers', type: 'Isolation', targetMuscles: 'Triceps', sets: 3, reps: 12, isCompleted: false }
+            ]}
+        ];
+
+        function App() {
+            const todayDate = getTodayDate();
+            
+            // Load today's data or create fresh
+            const loadTodayData = () => {
+                const allData = localStorage.getItem('dailyWorkouts');
+                if (allData) {
+                    const parsed = JSON.parse(allData);
+                    if (parsed[todayDate]) {
+                        return parsed[todayDate];
+                    }
+                }
+                return getDefaultCategories();
+            };
+
+            const [categories, setCategories] = useState(loadTodayData);
+            const [selectedCategory, setSelectedCategory] = useState(null);
+            const [showStats, setShowStats] = useState(false);
+            const [expandedDays, setExpandedDays] = useState({});
+            const [toast, setToast] = useState({ show: false, message: '' });
+            const [showResetModal, setShowResetModal] = useState(false);
+
+            // Save today's data whenever categories change
+            useEffect(() => {
+                const allData = localStorage.getItem('dailyWorkouts');
+                const parsed = allData ? JSON.parse(allData) : {};
+                parsed[todayDate] = categories;
+                localStorage.setItem('dailyWorkouts', JSON.stringify(parsed));
+            }, [categories, todayDate]);
+
+            const showToast = (message) => {
+                setToast({ show: true, message });
+                setTimeout(() => setToast({ show: false, message: '' }), 3000);
+            };
+
+            const toggleExercise = (categoryId, exerciseId) => {
+                setCategories(prev => prev.map(cat => 
+                    cat.id === categoryId 
+                        ? {...cat, exercises: cat.exercises.map(ex => 
+                            ex.id === exerciseId ? {...ex, isCompleted: !ex.isCompleted} : ex
+                          )}
+                        : cat
+                ));
+            };
+
+            const saveAndExit = () => {
+                showToast('✓ Progress saved!');
+                setTimeout(() => setSelectedCategory(null), 500);
+            };
+
+            const resetAllWorkouts = () => {
+                setCategories(getDefaultCategories());
+                setShowResetModal(false);
+                showToast('✓ All workouts reset!');
+            };
+
+            const getProgress = (category) => {
+                const completed = category.exercises.filter(e => e.isCompleted).length;
+                return (completed / category.exercises.length) * 100;
+            };
+
+            const isInProgress = (category) => {
+                const completed = category.exercises.filter(e => e.isCompleted).length;
+                return completed > 0 && completed < category.exercises.length;
+            };
+
+            // Stats View
+            if (showStats) {
+                const allData = localStorage.getItem('dailyWorkouts');
+                const weeklyData = allData ? JSON.parse(allData) : {};
+                const weekDates = getWeekDates();
+                const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+                
+                const toggleDay = (day) => {
+                    setExpandedDays(prev => ({...prev, [day]: !prev[day]}));
+                };
+
+                const getWeekDaysWithData = () => {
+                    const today = new Date();
+                    const currentDay = today.getDay();
+                    
+                    return days.map((name, index) => {
+                        const dateStr = weekDates[index];
+                        const date = new Date(dateStr);
+                        
+                        // Get saved data for this specific day, or use fresh template if no data exists
+                        let dayData;
+                        if (weeklyData[dateStr]) {
+                            // This day has saved data - use a DEEP COPY to avoid reference issues
+                            dayData = JSON.parse(JSON.stringify(weeklyData[dateStr]));
+                            console.log(`${name} (${dateStr}): Has saved data`, dayData);
+                        } else {
+                            // No data for this day - use fresh template (shows all as not started)
+                            dayData = JSON.parse(JSON.stringify(getDefaultCategories()));
+                            console.log(`${name} (${dateStr}): No data, using template`);
+                        }
+                        
+                        return {
+                            name,
+                            dateStr,
+                            date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+                            isToday: index === currentDay,
+                            data: dayData
+                        };
+                    });
+                };
+
+                const weekDaysData = getWeekDaysWithData();
+
+                return (
+                    <div className="app">
+                        <div className="stats-view">
+                            <div className="stats-header">
+                                <button className="back-btn" onClick={() => setShowStats(false)}>
+                                    <ChevronLeftIcon /> Back
+                                </button>
+                                <h2>Weekly Progress</h2>
+                            </div>
+
+                            <div className="donut-container">
+                                <DonutChart weeklyData={weeklyData} categories={categories} />
+                                <div className="legend">
+                                    {categories.map(cat => (
+                                        <div key={cat.id} className="legend-item">
+                                            <div className="legend-color" style={{backgroundColor: cat.color}}></div>
+                                            <span>{cat.name}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="weekly-calendar">
+                                <div className="calendar-title">This Week's Activity</div>
+                                {weekDaysData.map(day => {
+                                    // Count categories with at least one exercise completed
+                                    const categoriesWithProgress = day.data.filter(cat => 
+                                        cat.exercises.some(e => e.isCompleted)
+                                    ).length;
+                                    const totalWorkouts = day.data.length;
+                                    const isExpanded = expandedDays[day.name];
+                                    
+                                    // Debug logging
+                                    const totalExercisesCompleted = day.data.reduce((sum, cat) => 
+                                        sum + cat.exercises.filter(e => e.isCompleted).length, 0
+                                    );
+                                    console.log(`${day.name}: ${categoriesWithProgress}/${totalWorkouts} categories with progress, ${totalExercisesCompleted} exercises completed`);
+
+                                    return (
+                                        <div key={day.name} className="day-card" onClick={() => toggleDay(day.name)}>
+                                            <div className="day-header">
+                                                <div className="day-info">
+                                                    <div className="day-name">{day.name} {day.isToday && '(Today)'}</div>
+                                                    <div className="day-date">{day.date}</div>
+                                                </div>
+                                                <div className="day-summary">
+                                                    <span className="workout-count">{categoriesWithProgress}/{totalWorkouts}</span>
+                                                    <ChevronRightIcon className={`chevron ${isExpanded ? 'open' : ''}`} />
+                                                </div>
+                                            </div>
+                                            <div className={`day-details ${isExpanded ? 'open' : ''}`}>
+                                                <div className="day-workouts">
+                                                    {day.data.map(workout => {
+                                                        const completed = workout.exercises.filter(e => e.isCompleted).length;
+                                                        const total = workout.exercises.length;
+                                                        let status = 'not-started';
+                                                        if (completed === total) status = 'completed';
+                                                        else if (completed > 0) status = 'in-progress';
+                                                        
+                                                        return (
+                                                            <div key={workout.id} className="day-workout-item">
+                                                                <div className="workout-color" style={{backgroundColor: workout.color}}></div>
+                                                                <div className="workout-name">{workout.name}</div>
+                                                                <div className={`workout-status ${status}`}>
+                                                                    {status === 'completed' ? 'Complete' : 
+                                                                     status === 'in-progress' ? `${completed}/${total}` : 
+                                                                     'Not Started'}
+                                                                </div>
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+
+            // Exercise View
+            if (selectedCategory) {
+                const category = categories.find(c => c.id === selectedCategory);
+                const completed = category.exercises.filter(e => e.isCompleted).length;
+                
+                return (
+                    <div className="app">
+                        <div className="exercise-view">
+                            <div className="category-header" style={{borderLeftColor: category.color}}>
+                                <div className="category-title">
+                                    <CategoryIcon categoryName={category.name} color={category.color} />
+                                    <h2>{category.name} Workout</h2>
+                                </div>
+                                <div className="category-stats">
+                                    <div>Progress: <span>{completed}/{category.exercises.length} completed</span></div>
+                                    <div>Time: <span>~{category.exercises.length * 4} min</span></div>
+                                </div>
+                            </div>
+                            <div className="exercise-list">
+                                {category.exercises.map(exercise => (
+                                    <div 
+                                        key={exercise.id} 
+                                        className={`exercise-item ${exercise.isCompleted ? 'completed' : ''}`} 
+                                        onClick={() => toggleExercise(category.id, exercise.id)}
+                                    >
+                                        <div className="checkbox"><CheckIcon /></div>
+                                        <div className="exercise-details">
+                                            <div className="exercise-name">{exercise.name}</div>
+                                            <div className="exercise-meta">{exercise.type} • {exercise.targetMuscles}</div>
+                                        </div>
+                                        <div className="exercise-sets">{exercise.sets}×{exercise.reps}</div>
+                                    </div>
+                                ))}
+                                <div style={{display: 'flex', gap: '10px', marginTop: '10px'}}>
+                                    <button 
+                                        className="action-button save-button" 
+                                        style={{flex: '1'}} 
+                                        onClick={() => {
+                                            setCategories(prev => prev.map(cat => 
+                                                cat.id === selectedCategory 
+                                                    ? {...cat, exercises: cat.exercises.map(ex => ({...ex, isCompleted: false}))}
+                                                    : cat
+                                            ));
+                                            showToast('✓ Workout reset!');
+                                        }}
+                                    >
+                                        <RefreshIcon /> Reset All
+                                    </button>
+                                    <button 
+                                        className="action-button complete-button" 
+                                        style={{flex: '1'}} 
+                                        onClick={() => {
+                                            setCategories(prev => prev.map(cat => 
+                                                cat.id === selectedCategory 
+                                                    ? {...cat, exercises: cat.exercises.map(ex => ({...ex, isCompleted: true}))}
+                                                    : cat
+                                            ));
+                                            showToast('🎉 All exercises completed!');
+                                        }}
+                                    >
+                                        <CheckIcon /> Complete All
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="action-bar">
+                            <button 
+                                className="action-button" 
+                                style={{width: '100%', background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)', color: 'white'}} 
+                                onClick={saveAndExit}
+                            >
+                                <SaveIcon /> Save & Exit
+                            </button>
+                        </div>
+                    </div>
+                );
+            }
+
+            // Main Dashboard
+            const overallPercent = Math.round(
+                categories.reduce((acc, cat) => acc + getProgress(cat), 0) / categories.length
+            );
+
+            // Calculate "This Week" - total completed categories across all days
+            const calculateWeeklyCompleted = () => {
+                const allData = localStorage.getItem('dailyWorkouts');
+                if (!allData) return 0;
+                
+                const weeklyData = JSON.parse(allData);
+                const weekDates = getWeekDates();
+                let totalCompleted = 0;
+                
+                weekDates.forEach(dateStr => {
+                    if (weeklyData[dateStr]) {
+                        const dayData = weeklyData[dateStr];
+                        // Count categories that are fully completed
+                        const fullyCompleted = dayData.filter(cat => 
+                            cat.exercises.every(e => e.isCompleted) && cat.exercises.length > 0
+                        ).length;
+                        totalCompleted += fullyCompleted;
+                    }
+                });
+                
+                return totalCompleted;
+            };
+
+            const weeklyCompleted = calculateWeeklyCompleted();
+
+            return (
+                <div className="app">
+                    <div className="header">
+                        <h1>My Workouts</h1>
+                        <div className="stats">
+                            <div className="stat-box">
+                                <div className="stat-number">{weeklyCompleted}</div>
+                                <div className="stat-label">This Week</div>
+                            </div>
+                            <div className="stat-box">
+                                <div className="stat-number">{overallPercent}%</div>
+                                <div className="stat-label">Today</div>
+                            </div>
+                        </div>
+                    </div>
+                    <button className="stats-button" onClick={() => setShowStats(true)}>
+                        <ChartIcon /> View Weekly Progress
+                    </button>
+                    <div className="category-list">
+                        {categories.map(category => {
+                            const completed = category.exercises.filter(e => e.isCompleted).length;
+                            const total = category.exercises.length;
+                            const percent = Math.round(getProgress(category));
+                            
+                            return (
+                                <div 
+                                    key={category.id} 
+                                    className="category-item" 
+                                    onClick={() => setSelectedCategory(category.id)}
+                                >
+                                    <div className="category-border" style={{backgroundColor: category.color}}></div>
+                                    <div className="category-content">
+                                        <CategoryIcon categoryName={category.name} color={category.color} />
+                                        <div className="category-info">
+                                            <div className="category-name">{category.name}</div>
+                                            <div className="progress-container">
+                                                <div className="progress-bar">
+                                                    <div className="progress-fill" style={{width: `${percent}%`}}></div>
+                                                </div>
+                                                <div className="progress-text">{completed}/{total} ({percent}%)</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {isInProgress(category) && <div className="in-progress-badge">IN PROGRESS</div>}
+                                </div>
+                            );
+                        })}
+                    </div>
+                    <button className="reset-button" onClick={() => setShowResetModal(true)}>
+                        <RefreshIcon /> Reset All Workouts for Next Week
+                    </button>
+                    
+                    {showResetModal && (
+                        <div className="modal-overlay" onClick={() => setShowResetModal(false)}>
+                            <div className="modal" onClick={e => e.stopPropagation()}>
+                                <h3>Reset All Workouts?</h3>
+                                <p>This will clear all completed exercises for today. This action cannot be undone.</p>
+                                <div className="modal-buttons">
+                                    <button className="modal-button cancel" onClick={() => setShowResetModal(false)}>
+                                        Cancel
+                                    </button>
+                                    <button className="modal-button danger" onClick={resetAllWorkouts}>
+                                        Reset All
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                    <div className={`toast ${toast.show ? 'show' : ''}`}>{toast.message}</div>
+                </div>
+            );
+        }
+
+        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+</body>
+</html>
