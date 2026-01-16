@@ -213,7 +213,8 @@
                 'Chest': <svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>,
                 'Core': <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>,
                 'Shoulders': <svg viewBox="0 0 24 24"><path d="M6.5 6.5l11 11"/><path d="M17.5 6.5l-11 11"/><circle cx="12" cy="12" r="9"/></svg>,
-                'Arms': <svg viewBox="0 0 24 24"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>
+                'Arms': <svg viewBox="0 0 24 24"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>,
+                'Aerobics': <svg viewBox="0 0 24 24"><path d="M13.5 5.5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM9.8 8.9L7 23h2.1l1.8-8 2.1 2v6h2v-7.5l-2.1-2 .6-3C14.8 12 16.8 13 19 13v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1L6 8.3V13h2V9.6l1.8-.7"/></svg>
             };
             return <div className="category-icon" style={{stroke: color}}>{icons[categoryName] || icons['Legs']}</div>;
         };
@@ -238,57 +239,86 @@
         // Template for fresh categories
         const getDefaultCategories = () => [
             { id: 'legs', name: 'Legs', color: '#f59e0b', exercises: [
-                { id: 'l1', name: 'Barbell Squats', type: 'Compound', targetMuscles: 'Quads, Glutes', sets: 4, reps: 8, isCompleted: false },
-                { id: 'l2', name: 'Romanian Deadlifts', type: 'Compound', targetMuscles: 'Hamstrings', sets: 3, reps: 10, isCompleted: false },
-                { id: 'l3', name: 'Walking Lunges', type: 'Unilateral', targetMuscles: 'Quads, Balance', sets: 3, reps: 12, isCompleted: false },
-                { id: 'l4', name: 'Leg Press', type: 'Machine', targetMuscles: 'Overall Legs', sets: 3, reps: 15, isCompleted: false },
-                { id: 'l5', name: 'Leg Curls', type: 'Isolation', targetMuscles: 'Hamstrings', sets: 3, reps: 12, isCompleted: false },
-                { id: 'l6', name: 'Leg Extensions', type: 'Isolation', targetMuscles: 'Quads', sets: 3, reps: 15, isCompleted: false },
-                { id: 'l7', name: 'Calf Raises', type: 'Isolation', targetMuscles: 'Calves', sets: 4, reps: 20, isCompleted: false },
-                { id: 'l8', name: 'Bulgarian Split Squats', type: 'Unilateral', targetMuscles: 'Quads, Glutes', sets: 3, reps: 10, isCompleted: false }
+                { id: 'l1', name: 'Barbell Squat', type: 'Compound', targetMuscles: 'Quads, Glutes', sets: 4, reps: 8, isCompleted: false },
+                { id: 'l2', name: 'Front Squat', type: 'Compound', targetMuscles: 'Quads, Core', sets: 3, reps: 8, isCompleted: false },
+                { id: 'l3', name: 'Lunges', type: 'Unilateral', targetMuscles: 'Quads, Balance', sets: 3, reps: 12, isCompleted: false },
+                { id: 'l4', name: 'Lateral Lunge', type: 'Unilateral', targetMuscles: 'Adductors, Glutes', sets: 3, reps: 10, isCompleted: false },
+                { id: 'l5', name: 'Step Up', type: 'Unilateral', targetMuscles: 'Quads, Glutes', sets: 3, reps: 12, isCompleted: false },
+                { id: 'l6', name: 'Step Down', type: 'Unilateral', targetMuscles: 'Quads, Control', sets: 3, reps: 12, isCompleted: false },
+                { id: 'l7', name: 'Calf Raise', type: 'Isolation', targetMuscles: 'Calves', sets: 4, reps: 20, isCompleted: false },
+                { id: 'l8', name: 'Cable Abduction', type: 'Isolation', targetMuscles: 'Hip Abductors', sets: 3, reps: 15, isCompleted: false },
+                { id: 'l9', name: 'Clam Shell', type: 'Activation', targetMuscles: 'Hip External Rotators', sets: 3, reps: 15, isCompleted: false },
+                { id: 'l10', name: 'Single Leg Deadlift', type: 'Unilateral', targetMuscles: 'Hamstrings, Balance', sets: 3, reps: 10, isCompleted: false },
+                { id: 'l11', name: 'Leg Press', type: 'Machine', targetMuscles: 'Overall Legs', sets: 3, reps: 15, isCompleted: false },
+                { id: 'l12', name: 'Leg Extension', type: 'Isolation', targetMuscles: 'Quads', sets: 3, reps: 15, isCompleted: false },
+                { id: 'l13', name: 'Leg Curl', type: 'Isolation', targetMuscles: 'Hamstrings', sets: 3, reps: 12, isCompleted: false },
+                { id: 'l14', name: 'Skater', type: 'Plyometric', targetMuscles: 'Lateral Power', sets: 3, reps: 20, isCompleted: false },
+                { id: 'l15', name: 'Plough', type: 'Flexibility', targetMuscles: 'Hamstrings, Back', sets: 3, reps: 30, isCompleted: false }
             ]},
             { id: 'back', name: 'Back', color: '#3b82f6', exercises: [
-                { id: 'b1', name: 'Pull-ups', type: 'Compound', targetMuscles: 'Lats, Biceps', sets: 4, reps: 8, isCompleted: false },
-                { id: 'b2', name: 'Barbell Rows', type: 'Compound', targetMuscles: 'Mid Back', sets: 4, reps: 10, isCompleted: false },
-                { id: 'b3', name: 'Lat Pulldowns', type: 'Machine', targetMuscles: 'Lats', sets: 3, reps: 12, isCompleted: false },
-                { id: 'b4', name: 'Seated Cable Rows', type: 'Cable', targetMuscles: 'Mid Back', sets: 3, reps: 12, isCompleted: false },
-                { id: 'b5', name: 'Face Pulls', type: 'Cable', targetMuscles: 'Rear Delts', sets: 3, reps: 15, isCompleted: false },
-                { id: 'b6', name: 'Deadlifts', type: 'Compound', targetMuscles: 'Full Back', sets: 3, reps: 6, isCompleted: false }
+                { id: 'b1', name: 'Back Extension', type: 'Isolation', targetMuscles: 'Lower Back', sets: 3, reps: 15, isCompleted: false },
+                { id: 'b2', name: 'Romanian Deadlift', type: 'Compound', targetMuscles: 'Hamstrings, Back', sets: 3, reps: 10, isCompleted: false },
+                { id: 'b3', name: 'One Hand Dumbbell Row', type: 'Unilateral', targetMuscles: 'Lats, Mid Back', sets: 3, reps: 12, isCompleted: false },
+                { id: 'b4', name: 'Barbell Row', type: 'Compound', targetMuscles: 'Mid Back', sets: 4, reps: 10, isCompleted: false },
+                { id: 'b5', name: 'Deadlift', type: 'Compound', targetMuscles: 'Full Back', sets: 4, reps: 6, isCompleted: false },
+                { id: 'b6', name: 'Chin Ups', type: 'Compound', targetMuscles: 'Lats, Biceps', sets: 4, reps: 8, isCompleted: false },
+                { id: 'b7', name: 'Body Row', type: 'Bodyweight', targetMuscles: 'Mid Back', sets: 3, reps: 12, isCompleted: false },
+                { id: 'b8', name: 'Pull Overs', type: 'Isolation', targetMuscles: 'Lats, Chest', sets: 3, reps: 12, isCompleted: false },
+                { id: 'b9', name: 'Lat Pull Down', type: 'Machine', targetMuscles: 'Lats', sets: 3, reps: 12, isCompleted: false },
+                { id: 'b10', name: 'Seated Cable Rows', type: 'Cable', targetMuscles: 'Mid Back', sets: 3, reps: 12, isCompleted: false },
+                { id: 'b11', name: 'Straight Arm Pull Down', type: 'Isolation', targetMuscles: 'Lats', sets: 3, reps: 15, isCompleted: false },
+                { id: 'b12', name: 'Cable Rear Raise', type: 'Isolation', targetMuscles: 'Rear Delts', sets: 3, reps: 15, isCompleted: false },
+                { id: 'b13', name: 'Face Pulls', type: 'Cable', targetMuscles: 'Rear Delts', sets: 3, reps: 15, isCompleted: false }
             ]},
             { id: 'chest', name: 'Chest', color: '#ec4899', exercises: [
-                { id: 'c1', name: 'Bench Press', type: 'Compound', targetMuscles: 'Chest, Triceps', sets: 4, reps: 8, isCompleted: false },
-                { id: 'c2', name: 'Incline Dumbbell Press', type: 'Compound', targetMuscles: 'Upper Chest', sets: 3, reps: 10, isCompleted: false },
-                { id: 'c3', name: 'Push-ups', type: 'Bodyweight', targetMuscles: 'Chest, Core', sets: 3, reps: 15, isCompleted: false },
-                { id: 'c4', name: 'Cable Flyes', type: 'Isolation', targetMuscles: 'Chest', sets: 3, reps: 12, isCompleted: false },
-                { id: 'c5', name: 'Dips', type: 'Compound', targetMuscles: 'Lower Chest', sets: 3, reps: 10, isCompleted: false },
-                { id: 'c6', name: 'Pec Deck', type: 'Machine', targetMuscles: 'Chest', sets: 3, reps: 15, isCompleted: false },
-                { id: 'c7', name: 'Decline Press', type: 'Compound', targetMuscles: 'Lower Chest', sets: 3, reps: 10, isCompleted: false }
+                { id: 'c1', name: 'Push Ups', type: 'Bodyweight', targetMuscles: 'Chest, Core', sets: 3, reps: 15, isCompleted: false },
+                { id: 'c2', name: 'Towel Fly', type: 'Bodyweight', targetMuscles: 'Chest', sets: 3, reps: 12, isCompleted: false },
+                { id: 'c3', name: 'Incline Dumbbell Fly', type: 'Isolation', targetMuscles: 'Upper Chest', sets: 3, reps: 12, isCompleted: false },
+                { id: 'c4', name: 'Bench Press', type: 'Compound', targetMuscles: 'Chest, Triceps', sets: 4, reps: 8, isCompleted: false },
+                { id: 'c5', name: 'Incline Barbell Press', type: 'Compound', targetMuscles: 'Upper Chest', sets: 3, reps: 10, isCompleted: false },
+                { id: 'c6', name: 'Dips', type: 'Compound', targetMuscles: 'Lower Chest, Triceps', sets: 3, reps: 10, isCompleted: false },
+                { id: 'c7', name: 'Machine Chest Press', type: 'Machine', targetMuscles: 'Overall Chest', sets: 3, reps: 12, isCompleted: false }
             ]},
             { id: 'core', name: 'Core', color: '#8b5cf6', exercises: [
-                { id: 'co1', name: 'Planks', type: 'Isometric', targetMuscles: 'Abs, Core', sets: 3, reps: 60, isCompleted: false },
-                { id: 'co2', name: 'Crunches', type: 'Isolation', targetMuscles: 'Abs', sets: 3, reps: 20, isCompleted: false },
-                { id: 'co3', name: 'Leg Raises', type: 'Isolation', targetMuscles: 'Lower Abs', sets: 3, reps: 15, isCompleted: false },
-                { id: 'co4', name: 'Russian Twists', type: 'Rotation', targetMuscles: 'Obliques', sets: 3, reps: 20, isCompleted: false },
-                { id: 'co5', name: 'Mountain Climbers', type: 'Dynamic', targetMuscles: 'Full Core', sets: 3, reps: 20, isCompleted: false },
-                { id: 'co6', name: 'Bicycle Crunches', type: 'Dynamic', targetMuscles: 'Abs, Obliques', sets: 3, reps: 20, isCompleted: false },
-                { id: 'co7', name: 'Dead Bug', type: 'Stability', targetMuscles: 'Core', sets: 3, reps: 12, isCompleted: false },
-                { id: 'co8', name: 'Hanging Knee Raises', type: 'Advanced', targetMuscles: 'Lower Abs', sets: 3, reps: 10, isCompleted: false },
-                { id: 'co9', name: 'Ab Wheel Rollouts', type: 'Advanced', targetMuscles: 'Full Core', sets: 3, reps: 10, isCompleted: false }
+                { id: 'co1', name: 'Crunch', type: 'Isolation', targetMuscles: 'Abs', sets: 3, reps: 20, isCompleted: false },
+                { id: 'co2', name: 'Crossover Crunch', type: 'Dynamic', targetMuscles: 'Abs, Obliques', sets: 3, reps: 15, isCompleted: false },
+                { id: 'co3', name: 'Oblique Crunches', type: 'Isolation', targetMuscles: 'Obliques', sets: 3, reps: 20, isCompleted: false },
+                { id: 'co4', name: 'Ab Wheel', type: 'Advanced', targetMuscles: 'Full Core', sets: 3, reps: 10, isCompleted: false },
+                { id: 'co5', name: 'Hanging Leg Raises', type: 'Advanced', targetMuscles: 'Lower Abs', sets: 3, reps: 10, isCompleted: false },
+                { id: 'co6', name: 'Bridge', type: 'Stability', targetMuscles: 'Glutes, Core', sets: 3, reps: 30, isCompleted: false },
+                { id: 'co7', name: 'Arm-Leg Extension', type: 'Stability', targetMuscles: 'Core, Balance', sets: 3, reps: 12, isCompleted: false },
+                { id: 'co8', name: 'Front Plank', type: 'Isometric', targetMuscles: 'Abs, Core', sets: 3, reps: 60, isCompleted: false },
+                { id: 'co9', name: 'Side Plank', type: 'Isometric', targetMuscles: 'Obliques, Core', sets: 3, reps: 45, isCompleted: false },
+                { id: 'co10', name: 'Renegade Row Push Ups', type: 'Dynamic', targetMuscles: 'Core, Chest', sets: 3, reps: 10, isCompleted: false },
+                { id: 'co11', name: 'PNF Diagonal Raise', type: 'Functional', targetMuscles: 'Full Core', sets: 3, reps: 12, isCompleted: false },
+                { id: 'co12', name: 'Wood Chopper', type: 'Rotation', targetMuscles: 'Obliques', sets: 3, reps: 15, isCompleted: false }
             ]},
             { id: 'shoulders', name: 'Shoulders', color: '#10b981', exercises: [
-                { id: 's1', name: 'Overhead Press', type: 'Compound', targetMuscles: 'Shoulders, Triceps', sets: 4, reps: 8, isCompleted: false },
-                { id: 's2', name: 'Lateral Raises', type: 'Isolation', targetMuscles: 'Side Delts', sets: 3, reps: 12, isCompleted: false },
-                { id: 's3', name: 'Front Raises', type: 'Isolation', targetMuscles: 'Front Delts', sets: 3, reps: 12, isCompleted: false },
-                { id: 's4', name: 'Arnold Press', type: 'Compound', targetMuscles: 'All Delts', sets: 3, reps: 10, isCompleted: false },
-                { id: 's5', name: 'Shrugs', type: 'Isolation', targetMuscles: 'Traps', sets: 3, reps: 15, isCompleted: false }
+                { id: 's1', name: 'Shoulder External Rotation', type: 'Isolation', targetMuscles: 'Rotator Cuff', sets: 3, reps: 15, isCompleted: false },
+                { id: 's2', name: 'Rear Raise', type: 'Isolation', targetMuscles: 'Rear Delts', sets: 3, reps: 12, isCompleted: false },
+                { id: 's3', name: 'Upright Rows', type: 'Compound', targetMuscles: 'Shoulders, Traps', sets: 3, reps: 12, isCompleted: false },
+                { id: 's4', name: 'Dumbbell Shrugs', type: 'Isolation', targetMuscles: 'Traps', sets: 3, reps: 15, isCompleted: false },
+                { id: 's5', name: 'Overhead Press', type: 'Compound', targetMuscles: 'Shoulders, Triceps', sets: 4, reps: 8, isCompleted: false },
+                { id: 's6', name: 'Front Raise', type: 'Isolation', targetMuscles: 'Front Delts', sets: 3, reps: 12, isCompleted: false },
+                { id: 's7', name: 'Empty Cans', type: 'Isolation', targetMuscles: 'Rotator Cuff', sets: 3, reps: 15, isCompleted: false },
+                { id: 's8', name: 'Lateral Raise', type: 'Isolation', targetMuscles: 'Side Delts', sets: 3, reps: 12, isCompleted: false }
             ]},
-            { id: 'arms', name: 'Arms', color: '#ef4444', exercises: [
-                { id: 'a1', name: 'Barbell Curls', type: 'Isolation', targetMuscles: 'Biceps', sets: 4, reps: 10, isCompleted: false },
-                { id: 'a2', name: 'Tricep Dips', type: 'Compound', targetMuscles: 'Triceps', sets: 4, reps: 12, isCompleted: false },
-                { id: 'a3', name: 'Hammer Curls', type: 'Isolation', targetMuscles: 'Biceps, Forearms', sets: 3, reps: 12, isCompleted: false },
-                { id: 'a4', name: 'Tricep Pushdowns', type: 'Isolation', targetMuscles: 'Triceps', sets: 3, reps: 15, isCompleted: false },
-                { id: 'a5', name: 'Preacher Curls', type: 'Isolation', targetMuscles: 'Biceps', sets: 3, reps: 12, isCompleted: false },
-                { id: 'a6', name: 'Skull Crushers', type: 'Isolation', targetMuscles: 'Triceps', sets: 3, reps: 12, isCompleted: false }
+            { id: 'arms', name: 'Arms', color: '#06b6d4', exercises: [
+                { id: 'a1', name: 'Triceps Extensions', type: 'Isolation', targetMuscles: 'Triceps', sets: 3, reps: 12, isCompleted: false },
+                { id: 'a2', name: 'Bench Dips', type: 'Bodyweight', targetMuscles: 'Triceps', sets: 3, reps: 15, isCompleted: false },
+                { id: 'a3', name: 'Biceps Curls', type: 'Isolation', targetMuscles: 'Biceps', sets: 3, reps: 12, isCompleted: false },
+                { id: 'a4', name: 'Hammer Curls', type: 'Isolation', targetMuscles: 'Biceps, Forearms', sets: 3, reps: 12, isCompleted: false },
+                { id: 'a5', name: 'Wrist Curls', type: 'Isolation', targetMuscles: 'Forearms', sets: 3, reps: 15, isCompleted: false },
+                { id: 'a6', name: 'Dumbbell Kickbacks', type: 'Isolation', targetMuscles: 'Triceps', sets: 3, reps: 12, isCompleted: false },
+                { id: 'a7', name: 'Triceps Pulldowns', type: 'Cable', targetMuscles: 'Triceps', sets: 3, reps: 15, isCompleted: false },
+                { id: 'a8', name: 'Barbell Curls', type: 'Isolation', targetMuscles: 'Biceps', sets: 4, reps: 10, isCompleted: false }
+            ]},
+            { id: 'aerobics', name: 'Aerobics', color: '#f97316', exercises: [
+                { id: 'ae1', name: 'Treadmill Running', type: 'Cardio Machine', targetMuscles: 'Full Body Cardio', sets: 1, reps: 30, isCompleted: false },
+                { id: 'ae2', name: 'Treadmill Walking', type: 'Cardio Machine', targetMuscles: 'Low Impact Cardio', sets: 1, reps: 30, isCompleted: false },
+                { id: 'ae3', name: 'Elliptical Trainer', type: 'Cardio Machine', targetMuscles: 'Full Body, Low Impact', sets: 1, reps: 30, isCompleted: false },
+                { id: 'ae4', name: 'Rowing Machine', type: 'Cardio Machine', targetMuscles: 'Full Body, Back', sets: 1, reps: 20, isCompleted: false },
+                { id: 'ae5', name: 'Stair Climber', type: 'Cardio Machine', targetMuscles: 'Legs, Glutes, Cardio', sets: 1, reps: 20, isCompleted: false }
             ]}
         ];
 
